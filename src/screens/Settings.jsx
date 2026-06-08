@@ -7,8 +7,22 @@ const THEMES = [
 ]
 const TARGETS = [256, 512, 1024, 2048, 4096]
 
+function Toggle({ on, onChange }) {
+  return (
+    <button
+      className={`switch ${on ? 'on' : ''}`}
+      onClick={onChange}
+      aria-pressed={on}
+      type="button"
+    >
+      <span className="knob" />
+    </button>
+  )
+}
+
 export default function Settings({ onNavigate }) {
-  const { size, theme, target, update, resetBestScore, bestScore } = useSettings()
+  const { size, theme, target, sound, undoEnabled, update, resetBestScore, bestScore } =
+    useSettings()
 
   return (
     <div className="screen settings">
@@ -64,6 +78,23 @@ export default function Settings({ onNavigate }) {
             </button>
           ))}
         </div>
+      </div>
+
+      <div className="setting-group">
+        <div className="toggle-row">
+          <span className="setting-label inline">효과음</span>
+          <Toggle on={sound} onChange={() => update({ sound: !sound })} />
+        </div>
+      </div>
+
+      <div className="setting-group">
+        <div className="toggle-row">
+          <span className="setting-label inline">간고등어 모드 🐟</span>
+          <Toggle on={undoEnabled} onChange={() => update({ undoEnabled: !undoEnabled })} />
+        </div>
+        <p className="setting-hint">
+          켜면 게임에서 실행취소(되돌리기)를 쓸 수 있어요. (단축키 Z)
+        </p>
       </div>
 
       <div className="setting-group">

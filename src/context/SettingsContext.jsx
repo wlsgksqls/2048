@@ -6,6 +6,8 @@ const DEFAULT_SETTINGS = {
   size: 4, // 보드 크기 (3 | 4 | 5)
   theme: 'light', // 'light' | 'dark'
   target: 2048, // 승리 목표값
+  sound: true, // 효과음 on/off
+  undoEnabled: false, // 간고등어 모드: 실행취소(되돌리기) 허용 여부
   bestScore: 0,
 }
 

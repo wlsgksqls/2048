@@ -190,14 +190,19 @@ body {
   touch-action: none;
 }
 .board {
-  display: grid;
-  gap: 10px;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
   background: var(--surface);
   border-radius: 10px;
-  padding: 10px;
-  aspect-ratio: 1 / 1;
+}
+.grid-cell {
+  position: absolute;
+  border-radius: 6px;
+  background: var(--cell);
 }
 .tile {
+  position: absolute;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -206,11 +211,36 @@ body {
   font-size: clamp(18px, 7vw, 34px);
   background: var(--cell);
   color: var(--text);
-  transition: background 0.12s ease;
   user-select: none;
+  z-index: 2;
+  /* 슬라이드 애니메이션 */
+  transition: top 0.12s ease, left 0.12s ease, background 0.12s ease;
 }
-.tile-empty {
-  background: var(--cell);
+.tile.is-new {
+  animation: pop-in 0.16s ease;
+}
+.tile.is-merged {
+  animation: pop 0.16s ease;
+  z-index: 3;
+}
+@keyframes pop-in {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes pop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.18);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* 타일 값별 색상 (2048 클래식 팔레트) */
@@ -319,4 +349,54 @@ body {
   font-size: 24px;
   font-weight: 800;
   color: var(--text-invert);
+}
+
+/* ---------- 게임 컨트롤 (다시하기 / 실행취소) ---------- */
+.game-controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.game-controls .btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ---------- 토글 스위치 ---------- */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.setting-label.inline {
+  margin-bottom: 0;
+}
+.switch {
+  width: 52px;
+  height: 30px;
+  border: none;
+  border-radius: 999px;
+  background: var(--chip);
+  position: relative;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+}
+.switch.on {
+  background: var(--chip-active);
+}
+.switch .knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #fff;
+  transition: left 0.15s ease;
+}
+.switch.on .knob {
+  left: 25px;
 }
