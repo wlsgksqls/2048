@@ -7,6 +7,7 @@ import {
   hasWonTiles,
 } from '../game/gameLogic'
 import { playSound } from '../game/sound'
+import { chooseBestMove } from '../game/ai'
 import { useSettings } from '../context/SettingsContext'
 
 const KEY_TO_DIR = {
@@ -22,6 +23,7 @@ const KEY_TO_DIR = {
 
 const MOVE_ANIM_MS = 160 // 슬라이드 애니메이션 시간 (CSS와 동일)
 const HISTORY_LIMIT = 50
+const AUTO_INTERVAL_MS = 250 // Auto(AI) 한 수 간격 — 보통 속도
 
 /**
  * 2048 게임 상태와 입력 처리를 담당하는 훅.
@@ -36,6 +38,7 @@ export function useGame() {
   const [score, setScore] = useState(0)
   const [status, setStatus] = useState('playing') // 'playing' | 'won' | 'lost'
   const [canUndo, setCanUndo] = useState(false)
+  const [auto, setAuto] = useState(false) // Auto: AI 자동 풀이 on/off
 
   const historyRef = useRef([]) // [{ tiles, score }]
   // 최신 상태를 동기적으로 읽기 위한 ref (빠른 연속 입력 대응)
@@ -83,6 +86,7 @@ export function useGame() {
       setRemoved(res.removed)
       setScore(newScore)
       setStatus(newStatus)
+      if (newStatus !== 'playing') setAuto(false) // 게임오버/승리 시 Auto 정지
       if (newScore > 0) setBestScore(newScore)
       ref.current = { tiles: withNew, score: newScore, status: newStatus }
 
@@ -133,6 +137,21 @@ export function useGame() {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [applyMove, undo, undoEnabled])
 
+  const toggleAuto = useCallback(() => setAuto((a) => !a), [])
+
+  // Auto(AI) 자동 풀이 루프: 켜져 있고 진행 중일 때만 일정 간격으로 최선의 수를 둔다.
+  useEffect(() => {
+    if (!auto || status !== 'playing') return
+    const id = window.setInterval(() => {
+      const cur = ref.current
+      if (cur.status !== 'playing') return
+      const dir = chooseBestMove(cur.tiles, size)
+      if (dir) applyMove(dir)
+      else setAuto(false) // 둘 수 있는 수가 없으면 정지
+    }, AUTO_INTERVAL_MS)
+    return () => window.clearInterval(id)
+  }, [auto, status, size, applyMove])
+
   // 터치 스와이프 처리
   const touchStart = useRef(null)
   const onTouchStart = useCallback((e) => {
@@ -165,8 +184,10 @@ export function useGame() {
     size,
     undoEnabled,
     canUndo,
+    auto,
     restart,
     undo,
+    toggleAuto,
     move: applyMove,
     touchHandlers: { onTouchStart, onTouchEnd },
   }

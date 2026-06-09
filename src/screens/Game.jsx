@@ -35,8 +35,10 @@ export default function Game({ onNavigate }) {
     size,
     undoEnabled,
     canUndo,
+    auto,
     restart,
     undo,
+    toggleAuto,
     touchHandlers,
   } = useGame()
 
@@ -72,6 +74,13 @@ export default function Game({ onNavigate }) {
       </header>
 
       <div className="game-controls">
+        <button
+          className={`btn btn-auto ${auto ? 'on' : ''}`}
+          onClick={toggleAuto}
+          aria-pressed={auto}
+        >
+          🤖 자동: {auto ? '켜짐' : '꺼짐'}
+        </button>
         {undoEnabled && (
           <button className="btn btn-ghost" onClick={undo} disabled={!canUndo}>
             ↩ 실행취소
