@@ -1,4 +1,5 @@
 import { useSettings } from '../context/SettingsContext'
+import { VERSION } from '../version'
 
 export default function Lobby({ onNavigate }) {
   const { bestScore } = useSettings()
@@ -23,6 +24,7 @@ export default function Lobby({ onNavigate }) {
       </div>
 
       <p className="hint">화살표 키 또는 WASD · 모바일은 스와이프</p>
+      <p className="version">v{VERSION}</p>
     </div>
   )
 }
