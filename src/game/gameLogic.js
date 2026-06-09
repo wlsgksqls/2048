@@ -153,3 +153,37 @@ export function canMoveTiles(tiles, size) {
 export function hasWonTiles(tiles, target) {
   return tiles.some((t) => t.value >= target)
 }
+
+/**
+ * 이스터에그 조건: 한 줄(가로/세로/대각선)이 모두 같은 값(0 제외)으로
+ * 일렬로 채워져 있으면 true.
+ */
+export function hasEasterEggLine(tiles, size) {
+  const grid = Array.from({ length: size }, () => Array(size).fill(0))
+  tiles.forEach((t) => {
+    grid[t.row][t.col] = t.value
+  })
+  const allEqualNonZero = (vals) => vals[0] !== 0 && vals.every((v) => v === vals[0])
+
+  // 가로
+  for (let r = 0; r < size; r++) {
+    if (allEqualNonZero(grid[r])) return true
+  }
+  // 세로
+  for (let c = 0; c < size; c++) {
+    const col = []
+    for (let r = 0; r < size; r++) col.push(grid[r][c])
+    if (allEqualNonZero(col)) return true
+  }
+  // 대각선 (↘, ↙)
+  const main = []
+  const anti = []
+  for (let i = 0; i < size; i++) {
+    main.push(grid[i][i])
+    anti.push(grid[i][size - 1 - i])
+  }
+  if (allEqualNonZero(main)) return true
+  if (allEqualNonZero(anti)) return true
+
+  return false
+}

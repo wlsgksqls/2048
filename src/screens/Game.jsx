@@ -36,6 +36,7 @@ export default function Game({ onNavigate }) {
     undoEnabled,
     canUndo,
     auto,
+    easterEgg,
     restart,
     undo,
     toggleAuto,
@@ -92,7 +93,7 @@ export default function Game({ onNavigate }) {
       </div>
 
       <div className="board-wrap" {...touchHandlers}>
-        <div className="board">
+        <div className={`board${easterEgg === 'running' ? ' board-egg' : ''}`}>
           {backgroundCells}
           {allTiles.map((t) => (
             <div
@@ -107,7 +108,7 @@ export default function Game({ onNavigate }) {
           ))}
         </div>
 
-        {status !== 'playing' && (
+        {status !== 'playing' && easterEgg === 'idle' && (
           <div className="overlay">
             <div className="overlay-card">
               <h2>{status === 'won' ? '🎉 승리!' : '게임 오버'}</h2>
@@ -126,6 +127,19 @@ export default function Game({ onNavigate }) {
                 </button>
               </div>
             </div>
+          </div>
+        )}
+
+        {easterEgg === 'running' && (
+          <div className="egg-banner">
+            🥚 이스터에그 발동!! 숫자들이 미쳐 날뛴다… 💥 곧 펑!
+          </div>
+        )}
+
+        {easterEgg === 'boom' && (
+          <div className="overlay egg-boom">
+            <div className="boom-emoji">💥</div>
+            <div className="boom-text">펑!!!</div>
           </div>
         )}
       </div>
