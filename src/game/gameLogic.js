@@ -85,7 +85,7 @@ function findFarthest(grid, start, vector, size) {
  *   tiles: 이동 후 살아있는 타일(머지된 타일은 값이 2배, justMerged=true)
  *   removed: 머지로 흡수되어 사라진 타일(목적지 좌표로 갱신됨 — 슬라이드 애니메이션용)
  */
-export function moveTiles(tiles, size, direction) {
+export function moveTiles(tiles, size, direction, wild = false) {
   const vector = getVector(direction)
   const { rows, cols } = buildTraversals(vector, size)
 
@@ -107,9 +107,9 @@ export function moveTiles(tiles, size, direction) {
       const { farthest, next } = findFarthest(grid, { row, col }, vector, size)
       const target = next ? grid[next.row][next.col] : null
 
-      if (target && target.value === tile.value && !target.justMerged) {
-        // 머지: target이 값을 두 배로 흡수하고, tile은 사라진다.
-        target.value *= 2
+      // wild(이스터에그) 모드: 값과 무관하게 인접 타일을 합치고, 더 큰 값을 기준으로 한다.
+      if (target && !target.justMerged && (wild || target.value === tile.value)) {
+        target.value = wild ? Math.max(target.value, tile.value) : target.value * 2
         target.justMerged = true
         gained += target.value
         grid[row][col] = null

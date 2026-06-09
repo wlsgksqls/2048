@@ -113,7 +113,8 @@ export function useGame() {
       const withNew = spawnRandomTile(res.tiles, size)
       const newScore = cur.score + res.gained
 
-      // 이스터에그 우선 판정: 한 줄이 같은 값으로 채워지면 발동.
+      // 이스터에그 우선 판정: 한 줄이 같은 값으로 채워지면, 사용자에게 발동 여부를 묻는다.
+      // (이 동안에는 승리 목표값 판정도 하지 않는다.)
       if (hasEasterEggLine(withNew, size)) {
         setTiles(withNew)
         setRemoved(res.removed)
@@ -122,8 +123,7 @@ export function useGame() {
         setStatus('playing')
         setAuto(false)
         ref.current = { tiles: withNew, score: newScore, status: 'playing' }
-        setEasterEgg('running')
-        if (sound) playSound('egg')
+        setEasterEgg('prompt') // 확인 창 표시 (running은 사용자가 '발동'을 눌러야 시작)
         window.setTimeout(() => setRemoved([]), MOVE_ANIM_MS)
         return
       }
@@ -189,6 +189,15 @@ export function useGame() {
 
   const toggleAuto = useCallback(() => setAuto((a) => !a), [])
 
+  // 이스터에그 확인 창에서 '발동' / '취소'
+  const runEasterEgg = useCallback(() => {
+    setEasterEgg((e) => (e === 'prompt' ? 'running' : e))
+    if (sound) playSound('egg')
+  }, [sound])
+  const cancelEasterEgg = useCallback(() => {
+    setEasterEgg((e) => (e === 'prompt' ? 'idle' : e))
+  }, [])
+
   // Auto(AI) 자동 풀이 루프: 켜져 있고 진행 중일 때만 일정 간격으로 최선의 수를 둔다.
   useEffect(() => {
     if (!auto || status !== 'playing' || easterEgg !== 'idle') return
@@ -218,7 +227,8 @@ export function useGame() {
     const chaos = window.setInterval(() => {
       const curTiles = ref.current.tiles
       const dir = dirs[Math.floor(Math.random() * dirs.length)]
-      const res = moveTiles(curTiles, size, dir)
+      // wild=true: 값과 무관하게 막 합쳐지고, 큰 값을 기준으로 한다.
+      const res = moveTiles(curTiles, size, dir, true)
       const next = spawnRandomTile(res.moved ? res.tiles : curTiles, size)
       setTiles(next)
       setRemoved(res.moved ? res.removed : [])
@@ -286,6 +296,8 @@ export function useGame() {
     restart,
     undo,
     toggleAuto,
+    runEasterEgg,
+    cancelEasterEgg,
     move: applyMove,
     touchHandlers: { onTouchStart, onTouchEnd },
   }
