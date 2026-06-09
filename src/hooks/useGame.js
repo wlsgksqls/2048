@@ -72,6 +72,18 @@ export function useGame() {
     restart()
   }, [size, restart])
 
+  // 안전망: 어떤 경로로 보드가 채워졌든, 더 이상 이동할 수 없으면 게임 오버로 판정한다.
+  // (입력 경로에 의존하지 않으므로 꽉 막힌 상태가 절대 누락되지 않는다.)
+  useEffect(() => {
+    if (status !== 'playing' || easterEgg !== 'idle') return
+    if (!canMoveTiles(tiles, size)) {
+      setStatus('lost')
+      setAuto(false)
+      ref.current = { ...ref.current, status: 'lost' }
+      if (sound) playSound('lose')
+    }
+  }, [tiles, status, size, easterEgg, sound])
+
   const applyMove = useCallback(
     (direction) => {
       if (eggRef.current !== 'idle') return // 이스터에그 중에는 입력 무시
