@@ -362,6 +362,17 @@ body {
   opacity: 0.4;
   cursor: not-allowed;
 }
+/* Auto(AI) 토글 버튼은 왼쪽에 배치, 켜지면 강조 */
+.btn-auto {
+  margin-right: auto;
+  background: var(--chip);
+  color: var(--text);
+}
+.btn-auto.on {
+  background: var(--chip-active);
+  color: var(--text-invert);
+  box-shadow: 0 0 0 2px var(--chip-active);
+}
 
 /* ---------- 토글 스위치 ---------- */
 .toggle-row {
