@@ -53,6 +53,10 @@ export function playSound(name) {
       return arpeggio([523, 659, 784, 1047])
     case 'lose':
       return beep({ freq: 320, slideTo: 110, dur: 0.45, type: 'sawtooth', gain: 0.05 })
+    case 'egg':
+      return arpeggio([660, 880, 660, 990])
+    case 'boom':
+      return beep({ freq: 180, slideTo: 40, dur: 0.7, type: 'sawtooth', gain: 0.12 })
     default:
       return undefined
   }
